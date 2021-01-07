@@ -1,7 +1,7 @@
 Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 ------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2018.3 (lin64) Build 2405991 Thu Dec  6 23:36:41 MST 2018
-| Date         : Fri Dec 18 19:09:41 2020
+| Date         : Mon Dec 28 15:16:00 2020
 | Host         : novauto-74 running 64-bit Ubuntu 16.04.4 LTS
 | Command      : report_utilization -file utilization_channel4.txt
 | Design       : NoC
@@ -35,13 +35,13 @@ Table of Contents
 +----------------------------+-------+-------+-----------+-------+
 |          Site Type         |  Used | Fixed | Available | Util% |
 +----------------------------+-------+-------+-----------+-------+
-| CLB LUTs*                  | 12288 |     0 |   1182240 |  1.04 |
-|   LUT as Logic             |  4096 |     0 |   1182240 |  0.35 |
-|   LUT as Memory            |  8192 |     0 |    591840 |  1.38 |
+| CLB LUTs*                  |  9216 |     0 |   1182240 |  0.78 |
+|   LUT as Logic             |  3072 |     0 |   1182240 |  0.26 |
+|   LUT as Memory            |  6144 |     0 |    591840 |  1.04 |
 |     LUT as Distributed RAM |     0 |     0 |           |       |
-|     LUT as Shift Register  |  8192 |     0 |           |       |
-| CLB Registers              | 16464 |     0 |   2364480 |  0.70 |
-|   Register as Flip Flop    | 16464 |     0 |   2364480 |  0.70 |
+|     LUT as Shift Register  |  6144 |     0 |           |       |
+| CLB Registers              | 12348 |     0 |   2364480 |  0.52 |
+|   Register as Flip Flop    | 12348 |     0 |   2364480 |  0.52 |
 |   Register as Latch        |     0 |     0 |   2364480 |  0.00 |
 | CARRY8                     |     0 |     0 |    147780 |  0.00 |
 | F7 Muxes                   |     0 |     0 |    591120 |  0.00 |
@@ -66,7 +66,7 @@ Table of Contents
 | 0     |          Yes |           - |          Set |
 | 0     |          Yes |           - |        Reset |
 | 0     |          Yes |         Set |            - |
-| 16464 |          Yes |       Reset |            - |
+| 12348 |          Yes |       Reset |            - |
 +-------+--------------+-------------+--------------+
 
 
@@ -160,9 +160,9 @@ Table of Contents
 +----------+-------+---------------------+
 | Ref Name |  Used | Functional Category |
 +----------+-------+---------------------+
-| FDRE     | 16464 |            Register |
-| SRL16E   |  8192 |                 CLB |
-| LUT2     |  8192 |                 CLB |
+| FDRE     | 12348 |            Register |
+| SRL16E   |  6144 |                 CLB |
+| LUT2     |  6144 |                 CLB |
 +----------+-------+---------------------+
 
 
