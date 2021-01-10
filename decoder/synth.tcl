@@ -1,6 +1,6 @@
 create_project decoder -f ./decoder -part xcvu9p-fsgd2104-3-e
 
-read_verilog top.v
+read_verilog decoder.v
 read_verilog load_ins_parser.v
 read_verilog save_ins_parser.v
 

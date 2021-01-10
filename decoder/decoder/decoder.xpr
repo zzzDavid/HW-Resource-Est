@@ -6,7 +6,7 @@
 <Project Version="7" Minor="39" Path="/home/zhangniansong/ATC21-hw-rsc/decoder/decoder/decoder.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
-    <Option Name="Id" Val="40e9bd6969184a47aecb76615f82ccfc"/>
+    <Option Name="Id" Val="962ddfc35337479ea43480508ca9477f"/>
     <Option Name="Part" Val="xcvu9p-fsgd2104-3-e"/>
     <Option Name="CompiledLibDir" Val="$PCACHEDIR/compile_simlib"/>
     <Option Name="CompiledLibDirXSim" Val=""/>
@@ -58,7 +58,7 @@
   <FileSets Version="1" Minor="31">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
       <Filter Type="Srcs"/>
-      <File Path="$PPRDIR/../top.v">
+      <File Path="$PPRDIR/../decoder.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>

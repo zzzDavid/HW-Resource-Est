@@ -8,7 +8,8 @@ module decoder #(
     parameter   LOAD_INS_LEN     = 32 * 3, // LOAD instruction length
     parameter   SAVE_INS_LEN     = 32*4,   //SAVE instruction length
     parameter   IWB_SEL_W   = 2,
-    parameter   MAX_ADDR_W  = 12
+    parameter   MAX_ADDR_W  = 12,
+    parameter   INST_FIFO_SIZE = 10
 )(
     input wire clk,
     input wire rst,
