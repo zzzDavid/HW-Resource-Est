@@ -3,10 +3,10 @@
 <!--                                                         -->
 <!-- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="39" Path="/home/zhangniansong/ATC21-hw-rsc/noc/hoplite_noc/hoplite_noc.xpr">
+<Project Version="7" Minor="39" Path="/home/zhangniansong/ATC21-hw-rsc/fine-grained/project/finegrain.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
-    <Option Name="Id" Val="ae145fbe92404ec893d7bdf140784399"/>
+    <Option Name="Id" Val="2e4460e75bdd4b1080111f1f73629545"/>
     <Option Name="Part" Val="xcvu9p-fsgd2104-3-e"/>
     <Option Name="CompiledLibDir" Val="$PCACHEDIR/compile_simlib"/>
     <Option Name="CompiledLibDirXSim" Val=""/>
@@ -58,14 +58,14 @@
   <FileSets Version="1" Minor="31">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
       <Filter Type="Srcs"/>
-      <File Path="$PPRDIR/../NoC.v">
+      <File Path="$PPRDIR/../pe.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../hoplite.v">
+      <File Path="$PPRDIR/../omni_switch.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -74,8 +74,7 @@
       </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="NoC"/>
-        <Generic Name="num_channel" Val="4"/>
+        <Option Name="TopModule" Val="omni_switch"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">

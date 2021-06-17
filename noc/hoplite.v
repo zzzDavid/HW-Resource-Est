@@ -2,7 +2,7 @@ module hoplite #(
     parameter D_W = 512,
     parameter PIPENUM = 4,
     parameter SCHED = 8,
-    parameter LENGTH = 4 // data length?
+    parameter LENGTH = 4
 )(
     input wire clk,
     input wire rst,
