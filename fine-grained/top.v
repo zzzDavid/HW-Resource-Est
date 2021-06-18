@@ -26,7 +26,7 @@ wire [OFFCHIP_DW-1:0] membus_wdata_pipe_net [3:0][1:0];
 
 (* dont_touch = "true" *) reg [A_W-1:0]        actv_pipe_reg [15:0][1:0][PIPENUM-1:0];
 (* dont_touch = "true" *) reg [D_W-1:0]        psum_pipe_reg [15:0][1:0][PIPENUM-1:0];
-wire [A_W-1:0] actv_pipe_net [15:0][1:0][1:0]; // (subarray, i/o, pipeline start/end)
+wire [A_W-1:0] actv_pipe_net [15:0][1:0][1:0]; // (subarray, io, pipeline start/end)
 wire [D_W-1:0] psum_pipe_net [15:0][1:0][1:0];
 
 // connections between pod memory and PEs
@@ -41,7 +41,7 @@ wire [OFFCHIP_DW-1:0] mem_bus_w_data [3:0];
 wire [ADDR_W-1:0]     mem_bus_r_addr [3:0];
 wire [OFFCHIP_DW-1:0] mem_bus_r_data [3:0];
 
-genvar i, j, p, io;
+genvar i, j, p, d;
 generate for (i = 0; i < 4; i = i + 1) begin
     (* dont_touch = "true" *)
     pod_memory #(
@@ -81,19 +81,20 @@ generate for (i = 0; i < 4; i = i + 1) begin
     );
 
     always @(posedge clk) begin
-        membus_waddr_pipe_reg[i][0] <= membus_waddr_pipe_net[i][0];
-        membus_wdata_pipe_reg[i][0] <= membus_wdata_pipe_net[i][0];
-        membus_raddr_pipe_reg[i][0] <= membus_raddr_pipe_net[i][0];
-        membus_rdata_pipe_reg[i][0] <= membus_rdata_pipe_net[i][0];
+        if (rst) begin
+            membus_waddr_pipe_reg[i][0] <= 0;
+            membus_wdata_pipe_reg[i][0] <= 0;
+            membus_raddr_pipe_reg[i][0] <= 0;
+        end else begin
+            membus_waddr_pipe_reg[i][0] <= membus_waddr_pipe_net[i][0];
+            membus_wdata_pipe_reg[i][0] <= membus_wdata_pipe_net[i][0];
+            membus_raddr_pipe_reg[i][0] <= membus_raddr_pipe_net[i][0];
+            membus_rdata_pipe_reg[i][0] <= membus_rdata_pipe_net[i][0];
+        end
     end
-    assign membus_waddr_pipe_net[i][1] = membus_waddr_pipe_reg[i][PIPENUM-1];
-    assign membus_wdata_pipe_net[i][1] = membus_wdata_pipe_reg[i][PIPENUM-1];
-    assign membus_raddr_pipe_net[i][1] = membus_raddr_pipe_reg[i][PIPENUM-1];
-    assign membus_rdata_pipe_net[i][1] = membus_rdata_pipe_reg[i][PIPENUM-1];
-
 
     // membus pipeline
-    for (p = 0; p < PIPENUM-1; p = p + 1) begin
+    for (p = 1; p < PIPENUM; p = p + 1) begin
         always @* begin
             if (rst) begin
                 membus_waddr_pipe_reg[i][p] <= 0;
@@ -101,13 +102,18 @@ generate for (i = 0; i < 4; i = i + 1) begin
                 membus_raddr_pipe_reg[i][p] <= 0;
                 membus_rdata_pipe_reg[i][p] <= 0;
             end else begin
-                membus_waddr_pipe_reg[i][p+1] <= membus_waddr_pipe_reg[i][p];
-                membus_wdata_pipe_reg[i][p+1] <= membus_wdata_pipe_reg[i][p];
-                membus_raddr_pipe_reg[i][p+1] <= membus_raddr_pipe_reg[i][p];
-                membus_rdata_pipe_reg[i][p+1] <= membus_rdata_pipe_reg[i][p];
+                membus_waddr_pipe_reg[i][p] <= membus_waddr_pipe_reg[i][p-1];
+                membus_wdata_pipe_reg[i][p] <= membus_wdata_pipe_reg[i][p-1];
+                membus_raddr_pipe_reg[i][p] <= membus_raddr_pipe_reg[i][p-1];
+                membus_rdata_pipe_reg[i][p] <= membus_rdata_pipe_reg[i][p-1];
             end
        end
     end 
+    
+    assign membus_waddr_pipe_net[i][1] = membus_waddr_pipe_reg[i][PIPENUM-1];
+    assign membus_wdata_pipe_net[i][1] = membus_wdata_pipe_reg[i][PIPENUM-1];
+    assign membus_raddr_pipe_net[i][1] = membus_raddr_pipe_reg[i][PIPENUM-1];
+    assign membus_rdata_pipe_net[i][1] = membus_rdata_pipe_reg[i][PIPENUM-1];
 
 
     for (j = 0; j < 4; j = j + 1) begin
@@ -117,43 +123,48 @@ generate for (i = 0; i < 4; i = i + 1) begin
         ) PE_inst(
             .clk(clk),
             .rst(rst),
-            .in_psum_top(psum_pipe_net[(i*4+j+1)%16][0][1]),
             .in_psum_btm(psum_pipe_net[i*4+j][0][1]),
-            .out_psum_top(psum_pipe_net[(i*4+j+1)%16][1][0]),
+            .in_psum_top(psum_pipe_net[(i*4+j+1)%16][1][1]),
             .out_psum_btm(psum_pipe_net[i*4+j][1][0]),
+            .out_psum_top(psum_pipe_net[(i*4+j+1)%16][0][0]),
             .in_act_lft(actv_pipe_net[i*4+j][0][1]),
-            .in_act_rht(actv_pipe_net[(i*4+j+1)%16][0][1]),
+            .in_act_rht(actv_pipe_net[(i*4+j+1)%16][1][1]),
             .out_act_lft(actv_pipe_net[i*4+j][1][0]),
-            .out_act_rht(actv_pipe_net[(i*4+j+1)%16][1][0]),
+            .out_act_rht(actv_pipe_net[(i*4+j+1)%16][0][0]),
             .weight(pod_r_data_net[i][j]),
             .weight_addr(pod_r_addr_net[i][j]),
             .out_pod_data(pod_w_data_net[i][j]),
             .out_pod_addr(pod_w_addr_net[i][j])
         );
 
-        for (io = 0; io < 2; io = io + 1) begin
-            always @(posedge clk) begin
-                psum_pipe_reg[i*4+j][io][0] <= psum_pipe_net[i*4+j][io][0];
-                actv_pipe_reg[i*4+j][io][0] <= actv_pipe_net[i*4+j][io][0];
-            end
-            assign psum_pipe_net[i*4+j][io][1] = psum_pipe_reg[i*4+j][io][PIPENUM-1];
-            assign actv_pipe_net[i*4+j][io][1] = actv_pipe_reg[i*4+j][io][PIPENUM-1];
-        end
-
-        // level-2 ring bus pipeline
-        for (p = 0; p < PIPENUM-1; p = p + 1) begin
-            for (io = 0; io < 2; io = io + 1) begin
-                always @* begin
-                    if (rst) begin
-                        psum_pipe_reg[i*4+j][io][p] <= 0;
-                        actv_pipe_reg[i*4+j][io][p] <= 0;
-                    end else begin
-                        psum_pipe_reg[i*4+j][io][p+1] <= psum_pipe_reg[i*4+j][io][p];
-                        actv_pipe_reg[i*4+j][io][p+1] <= actv_pipe_reg[i*4+j][io][p];
-                    end
+        // pipeline inter-subarray connections
+        for (d = 0; d < 2; d = d + 1) begin
+            always @* begin
+                if (rst) begin
+                    psum_pipe_reg[i*4+j][d][0] <= 0;
+                    actv_pipe_reg[i*4+j][d][0] <= 0;  
+                end else begin
+                    psum_pipe_reg[i*4+j][d][0] <= psum_pipe_net[i*4+j][d][0];
+                    actv_pipe_reg[i*4+j][d][0] <= actv_pipe_net[i*4+j][d][0];
                 end
             end
-        end 
+
+            // level-2 ring bus pipeline
+            for (p = 1; p < PIPENUM; p = p + 1) begin
+                always @* begin
+                    if (rst) begin
+                        psum_pipe_reg[i*4+j][d][p] <= 0;
+                        actv_pipe_reg[i*4+j][d][p] <= 0;
+                    end else begin
+                        psum_pipe_reg[i*4+j][d][p] <= psum_pipe_reg[i*4+j][d][p-1];
+                        actv_pipe_reg[i*4+j][d][p] <= actv_pipe_reg[i*4+j][d][p-1];
+                    end
+                end
+            end 
+            
+            assign psum_pipe_net[i*4+j][d][1] = psum_pipe_reg[i*4+j][d][PIPENUM-1];
+            assign actv_pipe_net[i*4+j][d][1] = actv_pipe_reg[i*4+j][d][PIPENUM-1];
+        end
 
     end
 end
