@@ -1,6 +1,7 @@
 module omni_switch #(
     parameter D_W = 64, // partial sum and weights data width
-    parameter A_W = 16 // activation data width
+    parameter A_W = 16, // activation data width
+    parameter ADDR_W = 14 // address width
 )(
   input  wire clk,
   input  wire rst, 
@@ -12,7 +13,10 @@ module omni_switch #(
   input  wire [A_W-1:0] in_act_lft,  // input activation from left PE
   input  wire [A_W-1:0] in_act_rht,  // input activation from right PE
   output wire [A_W-1:0] out_act_lft, // output activation to left PE
-  output wire [A_W-1:0] out_act_rht  // output activation to right PE
+  output wire [A_W-1:0] out_act_rht, // output activation to right PE
+  output wire [ADDR_W-1:0]  weight_addr,  // weight address in pod memory
+  output wire [D_W-1:0]     out_pod_data, // write to pod data
+  output wire [ADDR_W-1:0]  out_pod_addr  // write to pod addr
 );
 
 // selection register
@@ -55,11 +59,15 @@ assign act_wire  = in_act_reg;
 
 (* dont_touch = "true" *) PE #(
     .D_W(D_W),
+    .ADDR_W(ADDR_W),
     .A_W(A_W)
 ) PE_inst(
     .clk(clk),
     .rst(rst),
     .weight(weight),
+    .weight_addr(weight_addr),
+    .out_pod_data(out_pod_data),
+    .out_pod_addr(out_pod_addr),
     .in_psum(psum_wire),
     .in_act(act_wire),
     .out_psum(out_psum_wire)
@@ -71,7 +79,7 @@ always @(posedge clk) begin
         out_act_reg <= 0;
     end else begin
         out_act_reg <= in_act_reg;
-        out_act_reg <= out_psum_wire;
+        out_psum_reg <= out_psum_wire;
     end
 end
 
@@ -101,10 +109,10 @@ always @* begin
         // EAST bound MUX
         case (a_d_sel)
             1'b0: begin
-                out_act_lft_reg <= in_act_reg; 
+                out_act_lft_reg <= out_act_reg; 
             end
             1'b1: begin
-                out_act_rht_reg <= in_act_reg;
+                out_act_rht_reg <= out_act_reg;
             end
         endcase
     end

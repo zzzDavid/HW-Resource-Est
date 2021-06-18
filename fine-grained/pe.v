@@ -4,11 +4,15 @@
 
 module PE #(
     parameter D_W = 64, // partial sum and weights data width
+    parameter ADDR_W = 14, // address width 
     parameter A_W = 16  // activation data width
 ) (
     input wire clk,
     input wire rst,
-    input wire [D_W-1:0]  weight,
+    input wire [D_W-1:0]      weight,
+    output wire [ADDR_W-1:0]  weight_addr,
+    output wire [D_W-1:0]     out_pod_data,
+    output wire [ADDR_W-1:0]  out_pod_addr,
     input wire [D_W-1:0]  in_psum,
     input wire [A_W-1:0]  in_act,
     output wire [D_W-1:0] out_psum
